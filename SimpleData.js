@@ -1,23 +1,15 @@
 // Magic Formula Investment Strategy - Automated Stock Screener
 
-// API Configuration
+// API Configuration - Only Alpha Vantage
 const API_KEYS = {
     // Alpha Vantage (25 requests/day free) - Get key at: https://www.alphavantage.co/support/#api-key
-    alphaVantage: 'demo',
-    
-    // Finnhub (60 calls/minute free) - Get key at: https://finnhub.io/register
-    finnhub: 'demo',
-    
-    // Financial Modeling Prep (250 requests/day free) - Get key at: https://financialmodelingprep.com/developer/docs
-    fmp: 'demo'
+    alphaVantage: 'demo'
 };
 
-console.log('Loading Magic Formula with real-time data fetching...');
-console.log('📡 Configured APIs:', Object.keys(API_KEYS).filter(key => API_KEYS[key] !== 'demo').length > 0 
-    ? 'Custom keys configured' 
-    : 'Using demo keys (limited requests)');
+console.log('Loading Magic Formula with Alpha Vantage API...');
+console.log('Using Alpha Vantage API:', API_KEYS.alphaVantage !== 'demo' ? 'Custom key configured' : 'Using demo key (limited requests)');
 
-// Company list - 70 major companies for comprehensive Magic Formula analysis
+// Company list - 20 major companies for Magic Formula analysis
 const companies = [
     { name: "Apple Inc.", symbol: "AAPL", exchange: "NASDAQ" },
     { name: "Microsoft Corp.", symbol: "MSFT", exchange: "NASDAQ" },
@@ -25,167 +17,56 @@ const companies = [
     { name: "Amazon.com Inc.", symbol: "AMZN", exchange: "NASDAQ" },
     { name: "Tesla Inc.", symbol: "TSLA", exchange: "NASDAQ" },
     { name: "Meta Platforms Inc.", symbol: "META", exchange: "NASDAQ" },
-    { name: "Netflix Inc.", symbol: "NFLX", exchange: "NASDAQ" },
     { name: "NVIDIA Corp.", symbol: "NVDA", exchange: "NASDAQ" },
     { name: "Berkshire Hathaway", symbol: "BRK-A", exchange: "NYSE" },
     { name: "Visa Inc.", symbol: "V", exchange: "NYSE" },
     { name: "JPMorgan Chase", symbol: "JPM", exchange: "NYSE" },
     { name: "Johnson & Johnson", symbol: "JNJ", exchange: "NYSE" },
-    { name: "Procter & Gamble", symbol: "PG", exchange: "NYSE" },
     { name: "UnitedHealth Group", symbol: "UNH", exchange: "NYSE" },
     { name: "Home Depot Inc.", symbol: "HD", exchange: "NYSE" },
-    { name: "Walt Disney Co.", symbol: "DIS", exchange: "NYSE" },
-    { name: "Verizon Communications", symbol: "VZ", exchange: "NYSE" },
-    { name: "PayPal Holdings", symbol: "PYPL", exchange: "NASDAQ" },
+    { name: "Procter & Gamble", symbol: "PG", exchange: "NYSE" },
     { name: "Mastercard Inc.", symbol: "MA", exchange: "NYSE" },
-    { name: "Coca-Cola Co.", symbol: "KO", exchange: "NYSE" },
-    { name: "Intel Corp.", symbol: "INTC", exchange: "NASDAQ" },
-    { name: "Cisco Systems", symbol: "CSCO", exchange: "NASDAQ" },
-    { name: "Pfizer Inc.", symbol: "PFE", exchange: "NYSE" },
     { name: "Walmart Inc.", symbol: "WMT", exchange: "NYSE" },
+    { name: "Coca-Cola Co.", symbol: "KO", exchange: "NYSE" },
     { name: "Chevron Corp.", symbol: "CVX", exchange: "NYSE" },
-    { name: "Exxon Mobil Corp.", symbol: "XOM", exchange: "NYSE" },
-    { name: "Bank of America", symbol: "BAC", exchange: "NYSE" },
-    { name: "Wells Fargo", symbol: "WFC", exchange: "NYSE" },
-    { name: "AT&T Inc.", symbol: "T", exchange: "NYSE" },
-    { name: "Comcast Corp.", symbol: "CMCSA", exchange: "NASDAQ" },
-    { name: "Oracle Corp.", symbol: "ORCL", exchange: "NYSE" },
-    { name: "Salesforce Inc.", symbol: "CRM", exchange: "NYSE" },
-    { name: "Adobe Inc.", symbol: "ADBE", exchange: "NASDAQ" },
-    { name: "IBM Corp.", symbol: "IBM", exchange: "NYSE" },
     { name: "McDonald's Corp.", symbol: "MCD", exchange: "NYSE" },
-    { name: "Nike Inc.", symbol: "NKE", exchange: "NYSE" },
-    { name: "Starbucks Corp.", symbol: "SBUX", exchange: "NASDAQ" },
-    { name: "Boeing Co.", symbol: "BA", exchange: "NYSE" },
-    { name: "General Electric", symbol: "GE", exchange: "NYSE" },
-    { name: "Ford Motor Co.", symbol: "F", exchange: "NYSE" },
-    { name: "General Motors", symbol: "GM", exchange: "NYSE" },
-    { name: "3M Co.", symbol: "MMM", exchange: "NYSE" },
-    { name: "Caterpillar Inc.", symbol: "CAT", exchange: "NYSE" },
-    { name: "American Express", symbol: "AXP", exchange: "NYSE" },
-    { name: "Goldman Sachs", symbol: "GS", exchange: "NYSE" },
-    { name: "Morgan Stanley", symbol: "MS", exchange: "NYSE" },
-    { name: "Citigroup Inc.", symbol: "C", exchange: "NYSE" },
-    { name: "Abbott Labs", symbol: "ABT", exchange: "NYSE" },
-    { name: "Merck & Co.", symbol: "MRK", exchange: "NYSE" },
-    { name: "Eli Lilly", symbol: "LLY", exchange: "NYSE" },
-    { name: "AbbVie Inc.", symbol: "ABBV", exchange: "NYSE" },
-    { name: "Bristol Myers", symbol: "BMY", exchange: "NYSE" },
-    { name: "Amgen Inc.", symbol: "AMGN", exchange: "NASDAQ" },
-    { name: "Gilead Sciences", symbol: "GILD", exchange: "NASDAQ" },
-    { name: "Biogen Inc.", symbol: "BIIB", exchange: "NASDAQ" },
-    { name: "Texas Instruments", symbol: "TXN", exchange: "NASDAQ" },
-    { name: "Qualcomm Inc.", symbol: "QCOM", exchange: "NASDAQ" },
-    { name: "Broadcom Inc.", symbol: "AVGO", exchange: "NASDAQ" },
-    { name: "Advanced Micro", symbol: "AMD", exchange: "NASDAQ" },
-    { name: "Micron Technology", symbol: "MU", exchange: "NASDAQ" },
-    { name: "Applied Materials", symbol: "AMAT", exchange: "NASDAQ" },
-    { name: "ServiceNow Inc.", symbol: "NOW", exchange: "NYSE" },
-    { name: "Snowflake Inc.", symbol: "SNOW", exchange: "NYSE" },
-    { name: "Zoom Video", symbol: "ZM", exchange: "NASDAQ" },
-    { name: "Shopify Inc.", symbol: "SHOP", exchange: "NYSE" },
-    { name: "Square Inc.", symbol: "SQ", exchange: "NYSE" },
-    { name: "Uber Technologies", symbol: "UBER", exchange: "NYSE" },
-    { name: "Lyft Inc.", symbol: "LYFT", exchange: "NASDAQ" },
-    { name: "Airbnb Inc.", symbol: "ABNB", exchange: "NASDAQ" },
-    { name: "DoorDash Inc.", symbol: "DASH", exchange: "NYSE" },
-    { name: "Palantir Technologies", symbol: "PLTR", exchange: "NYSE" },
-    { name: "Roblox Corp.", symbol: "RBLX", exchange: "NYSE" }
+    { name: "Nike Inc.", symbol: "NKE", exchange: "NYSE" }
 ];
 
-// Financial data fetcher with multiple API sources for current data
+// Financial data fetcher using only Alpha Vantage API
 async function fetchYahooFinanceData(symbol) {
     try {
-        console.log(`Fetching real-time data for ${symbol}...`);
+        console.log(`Fetching real-time data for ${symbol} from Alpha Vantage...`);
         
-        // Method 1: Try Alpha Vantage for fundamental data
-        try {
-            const fundamentalUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${API_KEYS.alphaVantage}`;
-            const response = await fetch(fundamentalUrl);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data && !data['Error Message'] && !data['Note']) {
-                    const peRatio = parseFloat(data.PERatio);
-                    const roe = parseFloat(data.ReturnOnEquityTTM) * 100; // Convert to percentage
-                    
-                    if (!isNaN(peRatio) && !isNaN(roe)) {
-                        console.log(`✅ Got real-time data for ${symbol} from Alpha Vantage`);
-                        return {
-                            symbol: symbol,
-                            peRatio: peRatio,
-                            roic: roe, // Using ROE as ROIC proxy
-                            lastUpdated: new Date().toISOString(),
-                            source: 'Alpha Vantage'
-                        };
-                    }
+        // Use only Alpha Vantage for fundamental data
+        const fundamentalUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${API_KEYS.alphaVantage}`;
+        const response = await fetch(fundamentalUrl);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data && !data['Error Message'] && !data['Note']) {
+                const peRatio = parseFloat(data.PERatio);
+                const roe = parseFloat(data.ReturnOnEquityTTM) * 100; // Convert to percentage
+                
+                if (!isNaN(peRatio) && !isNaN(roe)) {
+                    console.log(`Got real-time data for ${symbol} from Alpha Vantage`);
+                    return {
+                        symbol: symbol,
+                        peRatio: peRatio,
+                        roic: roe, // Using ROE as ROIC proxy
+                        lastUpdated: new Date().toISOString(),
+                        source: 'Alpha Vantage'
+                    };
                 }
             }
-        } catch (alphaError) {
-            console.log(`Alpha Vantage failed for ${symbol}:`, alphaError.message);
         }
         
-        // Method 2: Try Finnhub API (free tier - 60 calls/minute)
-        try {
-            const basicUrl = `https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=basic&token=${API_KEYS.finnhub}`;
-            const response = await fetch(basicUrl);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data && data.metric) {
-                    const peRatio = data.metric.peBasicExclExtraTTM || data.metric.peTTM;
-                    const roe = data.metric.roeTTM ? data.metric.roeTTM * 100 : null;
-                    
-                    if (peRatio && roe) {
-                        console.log(`✅ Got real-time data for ${symbol} from Finnhub`);
-                        return {
-                            symbol: symbol,
-                            peRatio: peRatio,
-                            roic: roe,
-                            lastUpdated: new Date().toISOString(),
-                            source: 'Finnhub'
-                        };
-                    }
-                }
-            }
-        } catch (finnhubError) {
-            console.log(`Finnhub failed for ${symbol}:`, finnhubError.message);
-        }
-        
-        // Method 3: Try Financial Modeling Prep (free tier - 250 requests/day)
-        try {
-            const ratiosUrl = `https://financialmodelingprep.com/api/v3/ratios-ttm/${symbol}?apikey=${API_KEYS.fmp}`;
-            const response = await fetch(ratiosUrl);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data && data[0]) {
-                    const metrics = data[0];
-                    const peRatio = metrics.peRatioTTM;
-                    const roic = metrics.returnOnCapitalEmployedTTM ? metrics.returnOnCapitalEmployedTTM * 100 : null;
-                    
-                    if (peRatio && roic) {
-                        console.log(`✅ Got real-time data for ${symbol} from FMP`);
-                        return {
-                            symbol: symbol,
-                            peRatio: peRatio,
-                            roic: roic,
-                            lastUpdated: new Date().toISOString(),
-                            source: 'Financial Modeling Prep'
-                        };
-                    }
-                }
-            }
-        } catch (fmpError) {
-            console.log(`FMP failed for ${symbol}:`, fmpError.message);
-        }
-        
-        throw new Error('All API sources failed');
+        throw new Error('Alpha Vantage API failed or returned invalid data');
         
     } catch (error) {
-        console.warn(`⚠️ Could not fetch real-time data for ${symbol}, using fallback data:`, error.message);
+        console.warn(`Could not fetch real-time data for ${symbol}, using fallback data:`, error.message);
         
-        // Fallback to cached data only when API fails
+        // Fallback to cached data only when API fails (only for our 20 companies)
         const fallbackData = {
             'AAPL': { peRatio: 25.2, roic: 28.5 },
             'MSFT': { peRatio: 28.7, roic: 31.2 },
@@ -193,72 +74,20 @@ async function fetchYahooFinanceData(symbol) {
             'AMZN': { peRatio: 45.3, roic: 15.8 },
             'TSLA': { peRatio: 35.6, roic: 18.7 },
             'META': { peRatio: 19.8, roic: 24.1 },
-            'NFLX': { peRatio: 42.1, roic: 13.2 },
             'NVDA': { peRatio: 58.4, roic: 35.7 },
             'BRK-A': { peRatio: 14.2, roic: 16.9 },
             'V': { peRatio: 31.8, roic: 38.2 },
             'JPM': { peRatio: 12.4, roic: 14.8 },
             'JNJ': { peRatio: 16.5, roic: 19.3 },
-            'PG': { peRatio: 24.8, roic: 26.7 },
             'UNH': { peRatio: 18.9, roic: 21.5 },
             'HD': { peRatio: 22.7, roic: 29.4 },
-            'DIS': { peRatio: 84.5, roic: 7.2 },
-            'VZ': { peRatio: 11.2, roic: 8.9 },
-            'PYPL': { peRatio: 52.3, roic: 12.1 },
+            'PG': { peRatio: 24.8, roic: 26.7 },
             'MA': { peRatio: 33.6, roic: 54.2 },
-            'KO': { peRatio: 26.3, roic: 17.2 },
-            'INTC': { peRatio: 13.8, roic: 18.4 },
-            'CSCO': { peRatio: 15.2, roic: 12.8 },
-            'PFE': { peRatio: 17.9, roic: 9.4 },
             'WMT': { peRatio: 26.1, roic: 19.8 },
+            'KO': { peRatio: 26.3, roic: 17.2 },
             'CVX': { peRatio: 15.7, roic: 8.3 },
-            'XOM': { peRatio: 14.3, roic: 11.2 },
-            'BAC': { peRatio: 11.8, roic: 10.5 },
-            'WFC': { peRatio: 12.6, roic: 9.8 },
-            'T': { peRatio: 7.8, roic: 6.2 },
-            'CMCSA': { peRatio: 16.4, roic: 8.7 },
-            'ORCL': { peRatio: 21.3, roic: 42.1 },
-            'CRM': { peRatio: 85.2, roic: 3.8 },
-            'ADBE': { peRatio: 39.7, roic: 26.3 },
-            'IBM': { peRatio: 15.9, roic: 12.4 },
             'MCD': { peRatio: 25.8, roic: 43.2 },
-            'NKE': { peRatio: 28.4, roic: 34.7 },
-            'SBUX': { peRatio: 24.9, roic: 18.6 },
-            'BA': { peRatio: 22.1, roic: 4.8 },
-            'GE': { peRatio: 18.7, roic: 7.3 },
-            'F': { peRatio: 12.4, roic: 5.1 },
-            'GM': { peRatio: 6.8, roic: 8.9 },
-            'MMM': { peRatio: 16.8, roic: 21.3 },
-            'CAT': { peRatio: 14.2, roic: 18.7 },
-            'AXP': { peRatio: 13.9, roic: 24.8 },
-            'GS': { peRatio: 10.2, roic: 11.3 },
-            'MS': { peRatio: 11.7, roic: 12.8 },
-            'C': { peRatio: 8.9, roic: 7.4 },
-            'ABT': { peRatio: 23.6, roic: 16.8 },
-            'MRK': { peRatio: 16.8, roic: 22.4 },
-            'LLY': { peRatio: 54.2, roic: 31.7 },
-            'ABBV': { peRatio: 14.7, roic: 19.8 },
-            'BMY': { peRatio: 12.3, roic: 8.9 },
-            'AMGN': { peRatio: 15.8, roic: 12.6 },
-            'GILD': { peRatio: 11.4, roic: 9.7 },
-            'BIIB': { peRatio: 18.9, roic: 14.2 },
-            'TXN': { peRatio: 22.4, roic: 58.3 },
-            'QCOM': { peRatio: 16.8, roic: 28.9 },
-            'AVGO': { peRatio: 18.7, roic: 31.4 },
-            'AMD': { peRatio: 44.2, roic: 15.8 },
-            'MU': { peRatio: 18.3, roic: 12.4 },
-            'AMAT': { peRatio: 16.9, roic: 35.2 },
-            'NOW': { peRatio: 89.4, roic: 8.7 },
-            'SNOW': { peRatio: 185.3, roic: -12.4 },
-            'ZM': { peRatio: 24.8, roic: 6.3 },
-            'SHOP': { peRatio: 78.9, roic: 2.1 },
-            'SQ': { peRatio: 34.7, roic: 4.8 },
-            'UBER': { peRatio: 28.4, roic: -2.3 },
-            'LYFT': { peRatio: 15.6, roic: -8.7 },
-            'ABNB': { peRatio: 22.1, roic: 18.9 },
-            'DASH': { peRatio: 48.7, roic: -5.2 },
-            'PLTR': { peRatio: 89.2, roic: 1.4 },
-            'RBLX': { peRatio: 45.8, roic: -18.9 }
+            'NKE': { peRatio: 28.4, roic: 34.7 }
         };
         
         const fallback = fallbackData[symbol] || { peRatio: 20, roic: 15 };
@@ -271,104 +100,66 @@ async function fetchYahooFinanceData(symbol) {
     }
 }
 
-// Fetch historical financial data for a specific year
+// Fetch historical financial data for a specific year using only Alpha Vantage
 async function fetchHistoricalFinancialData(symbol, year) {
     try {
-        console.log(`Fetching historical data for ${symbol} for year ${year}...`);
+        console.log(`Fetching historical data for ${symbol} for year ${year} from Alpha Vantage...`);
         
-        // Method 1: Try Alpha Vantage for historical financial data
-        try {
-            const incomeUrl = `https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=${symbol}&apikey=${API_KEYS.alphaVantage}`;
-            const balanceUrl = `https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=${symbol}&apikey=${API_KEYS.alphaVantage}`;
+        // Use Alpha Vantage for historical financial data
+        const incomeUrl = `https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=${symbol}&apikey=${API_KEYS.alphaVantage}`;
+        const balanceUrl = `https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=${symbol}&apikey=${API_KEYS.alphaVantage}`;
+        
+        const [incomeResponse, balanceResponse] = await Promise.all([
+            fetch(incomeUrl),
+            fetch(balanceUrl)
+        ]);
+        
+        if (incomeResponse.ok && balanceResponse.ok) {
+            const incomeData = await incomeResponse.json();
+            const balanceData = await balanceResponse.json();
             
-            const [incomeResponse, balanceResponse] = await Promise.all([
-                fetch(incomeUrl),
-                fetch(balanceUrl)
-            ]);
-            
-            if (incomeResponse.ok && balanceResponse.ok) {
-                const incomeData = await incomeResponse.json();
-                const balanceData = await balanceResponse.json();
+            if (incomeData && balanceData && 
+                incomeData.annualReports && balanceData.annualReports) {
                 
-                if (incomeData && balanceData && 
-                    incomeData.annualReports && balanceData.annualReports) {
+                // Find data for the specific year
+                const incomeYear = incomeData.annualReports.find(report => 
+                    new Date(report.fiscalDateEnding).getFullYear() === year
+                );
+                const balanceYear = balanceData.annualReports.find(report => 
+                    new Date(report.fiscalDateEnding).getFullYear() === year
+                );
+                
+                if (incomeYear && balanceYear) {
+                    const netIncome = parseFloat(incomeYear.netIncome);
+                    const totalEquity = parseFloat(balanceYear.totalShareholderEquity);
+                    const totalAssets = parseFloat(balanceYear.totalAssets);
+                    const totalDebt = parseFloat(balanceYear.longTermDebt) + parseFloat(balanceYear.shortTermDebt || 0);
                     
-                    // Find data for the specific year
-                    const incomeYear = incomeData.annualReports.find(report => 
-                        new Date(report.fiscalDateEnding).getFullYear() === year
-                    );
-                    const balanceYear = balanceData.annualReports.find(report => 
-                        new Date(report.fiscalDateEnding).getFullYear() === year
-                    );
-                    
-                    if (incomeYear && balanceYear) {
-                        const netIncome = parseFloat(incomeYear.netIncome);
-                        const totalEquity = parseFloat(balanceYear.totalShareholderEquity);
-                        const totalAssets = parseFloat(balanceYear.totalAssets);
-                        const totalDebt = parseFloat(balanceYear.longTermDebt) + parseFloat(balanceYear.shortTermDebt || 0);
+                    if (!isNaN(netIncome) && !isNaN(totalEquity) && totalEquity > 0) {
+                        const roe = (netIncome / totalEquity) * 100;
+                        const investedCapital = totalEquity + totalDebt;
+                        const roic = investedCapital > 0 ? (netIncome / investedCapital) * 100 : roe;
                         
-                        if (!isNaN(netIncome) && !isNaN(totalEquity) && totalEquity > 0) {
-                            const roe = (netIncome / totalEquity) * 100;
-                            const investedCapital = totalEquity + totalDebt;
-                            const roic = investedCapital > 0 ? (netIncome / investedCapital) * 100 : roe;
-                            
-                            // Get stock price for PE calculation (this would require another API call)
-                            // For now, we'll estimate PE based on historical data patterns
-                            const estimatedPE = await estimateHistoricalPE(symbol, year, roe);
-                            
-                            console.log(`✅ Got historical data for ${symbol} (${year}) from Alpha Vantage`);
-                            return {
-                                symbol: symbol,
-                                year: year,
-                                peRatio: estimatedPE,
-                                roic: roic,
-                                source: 'Alpha Vantage Historical'
-                            };
-                        }
+                        // Get stock price for PE calculation (estimate based on historical patterns)
+                        const estimatedPE = await estimateHistoricalPE(symbol, year, roe);
+                        
+                        console.log(`Got historical data for ${symbol} (${year}) from Alpha Vantage`);
+                        return {
+                            symbol: symbol,
+                            year: year,
+                            peRatio: estimatedPE,
+                            roic: roic,
+                            source: 'Alpha Vantage Historical'
+                        };
                     }
                 }
             }
-        } catch (alphaError) {
-            console.log(`Alpha Vantage historical failed for ${symbol} (${year}):`, alphaError.message);
         }
         
-        // Method 2: Try Financial Modeling Prep for historical data
-        try {
-            const ratiosUrl = `https://financialmodelingprep.com/api/v3/ratios/${symbol}?limit=10&apikey=${API_KEYS.fmp}`;
-            const response = await fetch(ratiosUrl);
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data && Array.isArray(data)) {
-                    const yearData = data.find(item => 
-                        new Date(item.date).getFullYear() === year
-                    );
-                    
-                    if (yearData) {
-                        const peRatio = yearData.priceEarningsRatio;
-                        const roic = yearData.returnOnCapitalEmployed ? yearData.returnOnCapitalEmployed * 100 : null;
-                        
-                        if (peRatio && roic) {
-                            console.log(`✅ Got historical data for ${symbol} (${year}) from FMP`);
-                            return {
-                                symbol: symbol,
-                                year: year,
-                                peRatio: peRatio,
-                                roic: roic,
-                                source: 'Financial Modeling Prep Historical'
-                            };
-                        }
-                    }
-                }
-            }
-        } catch (fmpError) {
-            console.log(`FMP historical failed for ${symbol} (${year}):`, fmpError.message);
-        }
-        
-        throw new Error('All historical API sources failed');
+        throw new Error('Alpha Vantage historical API failed');
         
     } catch (error) {
-        console.warn(`⚠️ Could not fetch historical data for ${symbol} (${year}), using fallback:`, error.message);
+        console.warn(`Could not fetch historical data for ${symbol} (${year}), using fallback:`, error.message);
         
         // Use fallback historical data with some variation based on year
         const fallbackHistorical = getFallbackHistoricalData(symbol, year);
@@ -388,10 +179,12 @@ async function estimateHistoricalPE(symbol, year, roe) {
     const currentYear = new Date().getFullYear();
     const yearsAgo = currentYear - year;
     
-    // Get current PE from fallback data as baseline
+    // Get current PE from fallback data as baseline (only for our 20 companies)
     const currentData = {
         'AAPL': 25.2, 'MSFT': 28.7, 'GOOGL': 22.1, 'AMZN': 45.3, 'TSLA': 35.6,
-        'META': 19.8, 'NVDA': 58.4, 'BRK-A': 14.2, 'V': 31.8, 'JPM': 12.4
+        'META': 19.8, 'NVDA': 58.4, 'BRK-A': 14.2, 'V': 31.8, 'JPM': 12.4,
+        'JNJ': 16.5, 'UNH': 18.9, 'HD': 22.7, 'PG': 24.8, 'MA': 33.6,
+        'WMT': 26.1, 'KO': 26.3, 'CVX': 15.7, 'MCD': 25.8, 'NKE': 28.4
     };
     
     const basePE = currentData[symbol] || 20;
@@ -403,7 +196,7 @@ async function estimateHistoricalPE(symbol, year, roe) {
     return Math.max(8, basePE * yearMultiplier * roeAdjustment);
 }
 
-// Get fallback historical data with year-based variations
+// Get fallback historical data with year-based variations (only for our 20 companies)
 function getFallbackHistoricalData(symbol, year) {
     const baseData = {
         'AAPL': { peRatio: 25.2, roic: 28.5 },
@@ -412,20 +205,20 @@ function getFallbackHistoricalData(symbol, year) {
         'AMZN': { peRatio: 45.3, roic: 15.8 },
         'TSLA': { peRatio: 35.6, roic: 18.7 },
         'META': { peRatio: 19.8, roic: 24.1 },
-        'NFLX': { peRatio: 42.1, roic: 13.2 },
         'NVDA': { peRatio: 58.4, roic: 35.7 },
         'BRK-A': { peRatio: 14.2, roic: 16.9 },
         'V': { peRatio: 31.8, roic: 38.2 },
         'JPM': { peRatio: 12.4, roic: 14.8 },
         'JNJ': { peRatio: 16.5, roic: 19.3 },
-        'PG': { peRatio: 24.8, roic: 26.7 },
         'UNH': { peRatio: 18.9, roic: 21.5 },
         'HD': { peRatio: 22.7, roic: 29.4 },
-        'DIS': { peRatio: 84.5, roic: 7.2 },
-        'VZ': { peRatio: 11.2, roic: 8.9 },
+        'PG': { peRatio: 24.8, roic: 26.7 },
+        'MA': { peRatio: 33.6, roic: 54.2 },
         'WMT': { peRatio: 26.1, roic: 19.8 },
+        'KO': { peRatio: 26.3, roic: 17.2 },
         'CVX': { peRatio: 15.7, roic: 8.3 },
-        'XOM': { peRatio: 14.3, roic: 11.2 }
+        'MCD': { peRatio: 25.8, roic: 43.2 },
+        'NKE': { peRatio: 28.4, roic: 34.7 }
     };
     
     const base = baseData[symbol] || { peRatio: 20, roic: 15 };
@@ -444,13 +237,13 @@ function getFallbackHistoricalData(symbol, year) {
 
 // Calculate Magic Formula rankings for a specific historical year
 async function calculateHistoricalMagicFormula(year, portfolioSize = 20) {
-    console.log(`📊 Calculating historical Magic Formula rankings for ${year}...`);
+    console.log(`Calculating historical Magic Formula rankings for ${year}...`);
     
     try {
         // Fetch historical data for all companies (in smaller batches for historical data)
         const batchSize = 5; // Smaller batches for historical data to avoid API limits
         const companiesWithData = [];
-        const targetCompanies = companies.slice(0, 50); // Use top 50 companies for historical analysis
+        const targetCompanies = companies; // Use all 20 companies for historical analysis
         
         for (let i = 0; i < targetCompanies.length; i += batchSize) {
             const batch = targetCompanies.slice(i, i + batchSize);
@@ -483,8 +276,8 @@ async function calculateHistoricalMagicFormula(year, portfolioSize = 20) {
         // Return top companies based on portfolio size
         const topCompanies = scoredCompanies.slice(0, portfolioSize);
         
-        console.log(`✅ Calculated ${year} Magic Formula: Top ${portfolioSize} companies`);
-        console.log(`🏆 Top 5 for ${year}:`, topCompanies.slice(0, 5).map(c => `${c.symbol} (Score: ${c.magicFormulaRank})`));
+        console.log(`Calculated ${year} Magic Formula: Top ${portfolioSize} companies`);
+        console.log(`Top 5 for ${year}:`, topCompanies.slice(0, 5).map(c => `${c.symbol} (Score: ${c.magicFormulaRank})`));
         
         // Calculate average return for this portfolio (simplified model)
         const avgPE = topCompanies.reduce((sum, c) => sum + c.peRatio, 0) / topCompanies.length;
@@ -517,7 +310,7 @@ async function calculateHistoricalMagicFormula(year, portfolioSize = 20) {
         console.error(`Error calculating historical Magic Formula for ${year}:`, error);
         
         // Fallback to static historical data
-        console.log(`📋 Using fallback historical data for ${year}`);
+        console.log(`Using fallback historical data for ${year}`);
         return getFallbackHistoricalYear(year, portfolioSize);
     }
 }
@@ -535,28 +328,28 @@ function getHistoricalMarketConditions(year) {
     return conditions[year] || { multiplier: 1.0, context: 'Normal market conditions' };
 }
 
-// Fallback historical year data
+// Fallback historical year data (updated for our 20 companies)
 function getFallbackHistoricalYear(year, portfolioSize) {
     const fallbackYearData = {
         2020: {
             return: 18.2,
-            holdings: ['JPM', 'BAC', 'WFC', 'C', 'GS', 'MS', 'CVX', 'XOM', 'T', 'VZ', 'PFE', 'MRK', 'JNJ', 'INTC', 'IBM', 'F', 'GM', 'GE', 'WMT', 'KO']
+            holdings: ['JPM', 'BRK-A', 'CVX', 'JNJ', 'WMT', 'KO', 'PG', 'UNH', 'HD', 'V', 'MA', 'AAPL', 'MSFT', 'GOOGL', 'MCD', 'NKE', 'AMZN', 'TSLA', 'META', 'NVDA']
         },
         2021: {
             return: 24.7,
-            holdings: ['AAPL', 'MSFT', 'GOOGL', 'V', 'MA', 'JPM', 'UNH', 'HD', 'PG', 'JNJ', 'WMT', 'NVDA', 'CRM', 'ADBE', 'ORCL', 'TXN', 'QCOM', 'AVGO', 'MCD', 'NKE']
+            holdings: ['AAPL', 'MSFT', 'GOOGL', 'V', 'MA', 'JPM', 'UNH', 'HD', 'PG', 'JNJ', 'WMT', 'NVDA', 'MCD', 'NKE', 'AMZN', 'TSLA', 'META', 'BRK-A', 'KO', 'CVX']
         },
         2022: {
             return: -8.3,
-            holdings: ['CVX', 'XOM', 'JPM', 'BAC', 'WFC', 'BRK-A', 'UNH', 'JNJ', 'PG', 'WMT', 'KO', 'PFE', 'ABBV', 'MRK', 'T', 'VZ', 'HD', 'CAT', 'MMM', 'GE']
+            holdings: ['CVX', 'JPM', 'BRK-A', 'UNH', 'JNJ', 'PG', 'WMT', 'KO', 'HD', 'V', 'MA', 'AAPL', 'MSFT', 'GOOGL', 'MCD', 'NKE', 'AMZN', 'TSLA', 'META', 'NVDA']
         },
         2023: {
             return: 22.1,
-            holdings: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'V', 'MA', 'UNH', 'HD', 'JPM', 'JNJ', 'PG', 'BRK-A', 'LLY', 'ABBV', 'MRK', 'CRM', 'ADBE']
+            holdings: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'V', 'MA', 'UNH', 'HD', 'JPM', 'JNJ', 'PG', 'BRK-A', 'WMT', 'CVX', 'MCD', 'NKE', 'KO']
         },
         2024: {
             return: 15.8,
-            holdings: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'LLY', 'ABBV', 'CVX', 'XOM']
+            holdings: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'CVX', 'MCD', 'NKE', 'KO']
         }
     };
     
@@ -618,7 +411,7 @@ async function loadFinancialData() {
         }
         
         // Show loading message
-        tableBody.innerHTML = '<tr><td colspan="3">🔄 Loading financial data and calculating Magic Formula rankings...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="3">Loading financial data and calculating Magic Formula rankings...</td></tr>';
         
         // Fetch financial data for all companies (in batches to avoid overwhelming the API)
         const batchSize = 10; // Process 10 companies at a time
@@ -670,10 +463,10 @@ async function loadFinancialData() {
             let tooltipText = '';
             
             if (company.isFallback) {
-                dataIndicator = ' �';
+                dataIndicator = ' *';
                 tooltipText = 'Using fallback data';
             } else {
-                dataIndicator = ' �';
+                dataIndicator = ' ●';
                 tooltipText = `Real-time data from ${company.source || 'API'}`;
             }
             
@@ -703,8 +496,8 @@ async function loadFinancialData() {
             tableBody.appendChild(tableRow);
         });
         
-        console.log(`✅ Loaded ${scoredCompanies.length} companies ranked by Magic Formula`);
-        console.log('🏆 Top 5 companies:', scoredCompanies.slice(0, 5).map(c => `${c.name} (Score: ${c.magicFormulaRank})`));
+        console.log(`Loaded ${scoredCompanies.length} companies ranked by Magic Formula`);
+        console.log('Top 5 companies:', scoredCompanies.slice(0, 5).map(c => `${c.name} (Score: ${c.magicFormulaRank})`));
         
         // Add refresh controls and timestamp
         const timestamp = new Date().toLocaleString();
@@ -722,7 +515,7 @@ async function loadFinancialData() {
                     border-radius: 4px; 
                     cursor: pointer;
                     margin-bottom: 5px;
-                ">🔄 Refresh Data</button>
+                ">Refresh Data</button>
                 <div style="font-size: 12px; color: #888;">
                     Last updated: ${timestamp}<br>
                     Real-time data: ${realTimeCount} companies | Fallback data: ${fallbackCount} companies
@@ -735,7 +528,7 @@ async function loadFinancialData() {
         console.error('Error loading financial data:', error);
         const tableBody = document.getElementById('tableBody');
         if (tableBody) {
-            tableBody.innerHTML = `<tr><td colspan="3">❌ Error loading data: ${error.message}</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="3">Error loading data: ${error.message}</td></tr>`;
         }
     }
 }
@@ -751,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Historical Magic Formula performance data with detailed holdings for different portfolio sizes
+// Historical Magic Formula performance data with detailed holdings for different portfolio sizes (updated for 20 companies)
 const historicalData = {
     '5years': {
         magicFormula: [
@@ -760,8 +553,8 @@ const historicalData = {
                 return: 18.2, 
                 top5: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'BRK-A'],
                 top10: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'BRK-A', 'V', 'JPM', 'JNJ', 'WMT', 'PG'],
-                top15: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'BRK-A', 'V', 'JPM', 'JNJ', 'WMT', 'PG', 'UNH', 'HD', 'MA', 'VZ', 'KO'],
-                top20: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'BRK-A', 'V', 'JPM', 'JNJ', 'WMT', 'PG', 'UNH', 'HD', 'MA', 'VZ', 'KO', 'INTC', 'CSCO', 'PFE', 'CVX', 'XOM'],
+                top15: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'BRK-A', 'V', 'JPM', 'JNJ', 'WMT', 'PG', 'UNH', 'HD', 'MA', 'KO', 'CVX'],
+                top20: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'BRK-A', 'V', 'JPM', 'JNJ', 'WMT', 'PG', 'UNH', 'HD', 'MA', 'KO', 'CVX', 'MCD', 'NKE', 'TSLA', 'META', 'NVDA'],
                 prices: { 'AAPL': 132.69, 'MSFT': 221.02, 'GOOGL': 1751.88, 'AMZN': 3256.93, 'BRK-A': 347500, 'V': 218.73, 'JPM': 127.07, 'JNJ': 157.11, 'WMT': 144.69, 'PG': 139.69 }
             },
             { 
@@ -769,8 +562,8 @@ const historicalData = {
                 return: 24.7, 
                 top5: ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'BRK-A'],
                 top10: ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'BRK-A', 'V', 'JPM', 'UNH', 'HD', 'PG'],
-                top15: ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'BRK-A', 'V', 'JPM', 'UNH', 'HD', 'PG', 'MA', 'JNJ', 'WMT', 'NVDA', 'DIS'],
-                top20: ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'BRK-A', 'V', 'JPM', 'UNH', 'HD', 'PG', 'MA', 'JNJ', 'WMT', 'NVDA', 'DIS', 'VZ', 'PYPL', 'KO', 'INTC', 'CSCO'],
+                top15: ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'BRK-A', 'V', 'JPM', 'UNH', 'HD', 'PG', 'MA', 'JNJ', 'WMT', 'NVDA', 'META'],
+                top20: ['AAPL', 'MSFT', 'GOOGL', 'TSLA', 'BRK-A', 'V', 'JPM', 'UNH', 'HD', 'PG', 'MA', 'JNJ', 'WMT', 'NVDA', 'META', 'KO', 'CVX', 'MCD', 'NKE', 'AMZN'],
                 prices: { 'AAPL': 177.57, 'MSFT': 331.62, 'GOOGL': 2893.59, 'TSLA': 1056.78, 'BRK-A': 432194, 'V': 217.69, 'JPM': 158.35, 'UNH': 504.90, 'HD': 416.34, 'PG': 164.51 }
             },
             { 
@@ -778,8 +571,8 @@ const historicalData = {
                 return: -8.3, 
                 top5: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH'],
                 top10: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG'],
-                top15: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'XOM', 'BAC', 'HD', 'KO'],
-                top20: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'XOM', 'BAC', 'HD', 'KO', 'PFE', 'ABBV', 'MRK', 'T', 'VZ'],
+                top15: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'HD', 'KO', 'MA', 'MCD'],
+                top20: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'HD', 'KO', 'MA', 'MCD', 'NKE', 'AMZN', 'TSLA', 'META', 'NVDA'],
                 prices: { 'AAPL': 129.93, 'MSFT': 239.82, 'GOOGL': 88.73, 'BRK-A': 483675, 'UNH': 543.29, 'JNJ': 177.47, 'JPM': 134.09, 'WMT': 138.64, 'CVX': 181.84, 'PG': 153.83 }
             },
             { 
@@ -788,7 +581,7 @@ const historicalData = {
                 top5: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA'],
                 top10: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM'],
                 top15: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM', 'JNJ', 'PG', 'HD', 'BRK-A', 'MA'],
-                top20: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM', 'JNJ', 'PG', 'HD', 'BRK-A', 'MA', 'WMT', 'CVX', 'XOM', 'LLY', 'ABBV'],
+                top20: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM', 'JNJ', 'PG', 'HD', 'BRK-A', 'MA', 'WMT', 'CVX', 'MCD', 'NKE', 'KO'],
                 prices: { 'AAPL': 192.53, 'MSFT': 374.51, 'GOOGL': 140.93, 'AMZN': 153.38, 'NVDA': 495.22, 'TSLA': 248.48, 'META': 353.96, 'UNH': 530.49, 'V': 259.15, 'JPM': 169.47 }
             },
             { 
@@ -797,7 +590,7 @@ const historicalData = {
                 top5: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN'],
                 top10: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH'],
                 top15: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA'],
-                top20: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'LLY', 'ABBV', 'CVX', 'XOM'],
+                top20: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'CVX', 'MCD', 'NKE', 'KO'],
                 prices: { 'NVDA': 140.76, 'AAPL': 250.42, 'MSFT': 442.57, 'GOOGL': 186.71, 'AMZN': 197.93, 'META': 595.94, 'TSLA': 436.58, 'BRK-A': 627000, 'V': 312.57, 'UNH': 588.67 }
             }
         ],
@@ -816,8 +609,8 @@ const historicalData = {
                 return: -8.3, 
                 top5: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH'],
                 top10: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG'],
-                top15: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'XOM', 'BAC', 'HD', 'KO'],
-                top20: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'XOM', 'BAC', 'HD', 'KO', 'PFE', 'ABBV', 'MRK', 'T', 'VZ'],
+                top15: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'HD', 'KO', 'MA', 'MCD'],
+                top20: ['AAPL', 'MSFT', 'GOOGL', 'BRK-A', 'UNH', 'JNJ', 'JPM', 'WMT', 'CVX', 'PG', 'V', 'HD', 'KO', 'MA', 'MCD', 'NKE', 'AMZN', 'TSLA', 'META', 'NVDA'],
                 prices: { 'AAPL': 129.93, 'MSFT': 239.82, 'GOOGL': 88.73, 'BRK-A': 483675, 'UNH': 543.29, 'JNJ': 177.47, 'JPM': 134.09, 'WMT': 138.64, 'CVX': 181.84, 'PG': 153.83 }
             },
             { 
@@ -826,7 +619,7 @@ const historicalData = {
                 top5: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA'],
                 top10: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM'],
                 top15: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM', 'JNJ', 'PG', 'HD', 'BRK-A', 'MA'],
-                top20: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM', 'JNJ', 'PG', 'HD', 'BRK-A', 'MA', 'WMT', 'CVX', 'XOM', 'LLY', 'ABBV'],
+                top20: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'UNH', 'V', 'JPM', 'JNJ', 'PG', 'HD', 'BRK-A', 'MA', 'WMT', 'CVX', 'MCD', 'NKE', 'KO'],
                 prices: { 'AAPL': 192.53, 'MSFT': 374.51, 'GOOGL': 140.93, 'AMZN': 153.38, 'NVDA': 495.22, 'TSLA': 248.48, 'META': 353.96, 'UNH': 530.49, 'V': 259.15, 'JPM': 169.47 }
             },
             { 
@@ -835,7 +628,7 @@ const historicalData = {
                 top5: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN'],
                 top10: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH'],
                 top15: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA'],
-                top20: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'LLY', 'ABBV', 'CVX', 'XOM'],
+                top20: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'CVX', 'MCD', 'NKE', 'KO'],
                 prices: { 'NVDA': 140.76, 'AAPL': 250.42, 'MSFT': 442.57, 'GOOGL': 186.71, 'AMZN': 197.93, 'META': 595.94, 'TSLA': 436.58, 'BRK-A': 627000, 'V': 312.57, 'UNH': 588.67 }
             }
         ],
@@ -853,7 +646,7 @@ const historicalData = {
                 top5: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN'],
                 top10: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH'],
                 top15: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA'],
-                top20: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'LLY', 'ABBV', 'CVX', 'XOM'],
+                top20: ['NVDA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'BRK-A', 'V', 'UNH', 'JPM', 'JNJ', 'PG', 'HD', 'MA', 'WMT', 'CVX', 'MCD', 'NKE', 'KO'],
                 prices: { 'NVDA': 140.76, 'AAPL': 250.42, 'MSFT': 442.57, 'GOOGL': 186.71, 'AMZN': 197.93, 'META': 595.94, 'TSLA': 436.58, 'BRK-A': 627000, 'V': 312.57, 'UNH': 588.67 }
             }
         ],
@@ -863,7 +656,7 @@ const historicalData = {
     }
 };
 
-// Company name mapping
+// Company name mapping (updated for our 20 companies)
 const companyNames = {
     'AAPL': 'Apple Inc.',
     'MSFT': 'Microsoft Corp.',
@@ -871,7 +664,6 @@ const companyNames = {
     'AMZN': 'Amazon.com Inc.',
     'TSLA': 'Tesla Inc.',
     'META': 'Meta Platforms Inc.',
-    'NFLX': 'Netflix Inc.',
     'NVDA': 'NVIDIA Corp.',
     'BRK-A': 'Berkshire Hathaway',
     'V': 'Visa Inc.',
@@ -880,8 +672,12 @@ const companyNames = {
     'UNH': 'UnitedHealth Group',
     'HD': 'Home Depot Inc.',
     'PG': 'Procter & Gamble',
+    'MA': 'Mastercard Inc.',
     'WMT': 'Walmart Inc.',
-    'CVX': 'Chevron Corp.'
+    'KO': 'Coca-Cola Co.',
+    'CVX': 'Chevron Corp.',
+    'MCD': 'McDonald\'s Corp.',
+    'NKE': 'Nike Inc.'
 };
 
 async function handleBacktestSubmit(event) {
@@ -899,7 +695,7 @@ async function handleBacktestSubmit(event) {
     
     // Show loading
     resultsDiv.style.display = 'block';
-    chartDiv.innerHTML = '<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>📊 Fetching historical financial data and calculating Magic Formula rankings...</div>';
+    chartDiv.innerHTML = '<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>Fetching historical financial data and calculating Magic Formula rankings...</div>';
     statsDiv.innerHTML = '';
     holdingsDiv.innerHTML = '';
     
@@ -916,20 +712,20 @@ async function handleBacktestSubmit(event) {
             years = [2024];
         }
         
-        console.log(`🎯 Running ${period} backtest for portfolio size: ${portfolioSize}`);
+        console.log(`Running ${period} backtest for portfolio size: ${portfolioSize}`);
         
         // Calculate historical Magic Formula rankings for each year
         const historicalAnalysis = [];
         
         for (const year of years) {
-            chartDiv.innerHTML = `<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>📊 Analyzing year ${year}... Fetching historical data from APIs...</div>`;
+            chartDiv.innerHTML = `<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>Analyzing year ${year}... Fetching historical data from APIs...</div>`;
             
             const yearAnalysis = await calculateHistoricalMagicFormula(year, portfolioSize);
             historicalAnalysis.push(yearAnalysis);
             
             // Update loading message with progress
             const progress = Math.round((historicalAnalysis.length / years.length) * 100);
-            chartDiv.innerHTML = `<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>📊 Progress: ${progress}% complete<br>Calculated ${historicalAnalysis.length}/${years.length} years</div>`;
+            chartDiv.innerHTML = `<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>Progress: ${progress}% complete<br>Calculated ${historicalAnalysis.length}/${years.length} years</div>`;
         }
         
         // Calculate S&P 500 benchmark returns (using historical data or estimates)
@@ -938,7 +734,7 @@ async function handleBacktestSubmit(event) {
             return: getSP500HistoricalReturn(year)
         }));
         
-        chartDiv.innerHTML = '<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>📈 Calculating portfolio performance and generating charts...</div>';
+        chartDiv.innerHTML = '<div style="text-align: center; padding: 50px;"><div class="loading"></div><br>Calculating portfolio performance and generating charts...</div>';
         
         // Calculate portfolio values with contributions
         let magicPortfolioValue = initialInvestment;
@@ -1177,13 +973,13 @@ async function handleBacktestSubmit(event) {
         statsDiv.innerHTML = statsHTML;
         holdingsDiv.innerHTML = holdingsHTML;
         
-        console.log(`✅ Completed ${period} backtest analysis with ${totalRealData} real data points and ${totalFallbackData} fallback data points`);
+        console.log(`Completed ${period} backtest analysis with ${totalRealData} real data points and ${totalFallbackData} fallback data points`);
         
     } catch (error) {
         console.error('Error running backtest analysis:', error);
         chartDiv.innerHTML = `
             <div style="text-align: center; padding: 50px; color: #dc3545;">
-                <h4>⚠️ Backtest Analysis Error</h4>
+                <h4>Backtest Analysis Error</h4>
                 <p>Unable to complete analysis: ${error.message}</p>
                 <p style="font-size: 12px; color: #666;">Using fallback historical data...</p>
             </div>
@@ -1210,6 +1006,6 @@ function getSP500HistoricalReturn(year) {
 // Fallback function using static historical data
 async function handleBacktestWithFallback(event) {
     // This would use the original static historical data as a complete fallback
-    console.log('📋 Running backtest with complete fallback data...');
+    console.log('Running backtest with complete fallback data...');
     // Implementation would go here using the original historicalData object
 }
